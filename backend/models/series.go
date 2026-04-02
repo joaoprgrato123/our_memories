@@ -2,8 +2,8 @@ package models
 
 import "time"
 
-type Plant struct {
-	Name      string    `json:"id"`
+type Serie struct {
+	ID        int64     `json:"id"`
 	Genre     string    `json:"genre"`
 	StartDate time.Time `json:"start_date"`
 	EndDate   time.Time `json:"end_date"`
@@ -13,6 +13,6 @@ type Plant struct {
 	Status    string    `json:"status"`
 }
 
-type Plants struct {
-	Plants []Plant `json:"plants"`
+type Series struct {
+	Series []Serie `json:"serie"`
 }
