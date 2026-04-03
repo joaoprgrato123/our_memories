@@ -9,7 +9,3 @@ type MTGCard struct {
 	Owned  bool   `json:"owned"`
 	Link   string `json:"link"`
 }
-
-type MtgDeck struct {
-	Cards []MTGCard `json:"cards"`
-}

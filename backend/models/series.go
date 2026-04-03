@@ -12,7 +12,3 @@ type Serie struct {
 	Duration  string    `json:"duration"`
 	Status    string    `json:"status"`
 }
-
-type Series struct {
-	Series []Serie `json:"serie"`
-}

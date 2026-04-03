@@ -14,7 +14,3 @@ type Plan struct {
 	Pdfs              string    `json:"pdf"`
 	Status            string    `json:"status"`
 }
-
-type Plans struct {
-	Plans []Plan `json:"plan"`
-}

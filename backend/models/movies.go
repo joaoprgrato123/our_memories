@@ -12,7 +12,3 @@ type Movie struct {
 	Duration  string    `json:"duration"`
 	Status    string    `json:"status"`
 }
-
-type Movies struct {
-	Movies []Movie `json:"movies"`
-}

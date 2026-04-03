@@ -12,7 +12,3 @@ type Plant struct {
 	Duration  string    `json:"duration"`
 	Status    string    `json:"status"`
 }
-
-type Plants struct {
-	Plants []Plant `json:"plants"`
-}
