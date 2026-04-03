@@ -1,0 +1,26 @@
+{
+  "cards": [
+    {
+      "id": 1,
+      "name": "Black Lotus",
+      "amount": 1,
+      "owner": "dudi",
+      "cost": 100,
+      "owned": false,
+      "link": ""
+    },
+    {
+      "id": 2,
+      "name": "Black Lotus",
+      "amount": 1,
+      "owner": "dudi",
+      "cost": 100,
+      "owned": false,
+      "link": ""
+    }
+  ],
+  "movies": null,
+  "series": null,
+  "plans": null,
+  "plants": null
+}

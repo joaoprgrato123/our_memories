@@ -9,7 +9,10 @@ import (
 // interface
 type MTGRepository interface {
 	GetAll() ([]models.MTGCard, error)
-	//"Create(card models.MTGCard) (models.MTGCard, error)"
+	GetByID(id int64) (models.MTGCard, error)
+	Create(card models.MTGCard) (models.MTGCard, error)
+	Update(card models.MTGCard) (models.MTGCard, error)
+	Delete(id int64) error
 }
 
 // constructor
