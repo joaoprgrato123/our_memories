@@ -4,6 +4,7 @@ import "time"
 
 type Movie struct {
 	ID        int64     `json:"id"`
+	Title     string    `json:"title"`
 	Genre     string    `json:"genre"`
 	StartDate time.Time `json:"start_date"`
 	EndDate   time.Time `json:"end_date"`

@@ -3,7 +3,8 @@ package models
 import "time"
 
 type Plant struct {
-	Name      string    `json:"id"`
+	ID        int64     `json:"id"`
+	Name      string    `json:"name"`
 	Genre     string    `json:"genre"`
 	StartDate time.Time `json:"start_date"`
 	EndDate   time.Time `json:"end_date"`
