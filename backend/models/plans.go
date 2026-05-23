@@ -15,4 +15,5 @@ type Plan struct {
 	Images            string    `json:"images"`
 	Pdfs              string    `json:"pdf"`
 	Status            string    `json:"status"`
+	Category          string    `json:"category"`
 }
