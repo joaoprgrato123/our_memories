@@ -42,7 +42,32 @@ func main() {
 	mux.HandleFunc("PUT /plan/{id}", planHandler.Update)
 	mux.HandleFunc("DELETE /plan/{id}", planHandler.Delete)
 
-	log.Println("Server running on :8080")
-	log.Fatal(http.ListenAndServe(":8080", mux))
+	// Wrap mux with CORS middleware
+	handler := corsMiddleware(mux)
 
+	log.Println("Server running on :8080")
+	log.Fatal(http.ListenAndServe(":8080", handler))
+
+}
+
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		// Allow your frontend origin
+		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
+
+		// Allowed methods
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+
+		// Allowed headers
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		// Handle preflight requests
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }
