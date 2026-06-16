@@ -1,0 +1,41 @@
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 90%;
+  margin-bottom: 30px;
+  margin-top: 20px;
+}
+
+.page-title {
+  font-size: 50px;
+  font-family: "Caprasimo", serif;
+  color: white;
+  margin-left: 50px;
+  text-shadow: 5px 5px 10px #0004;
+}
+
+.search-container {
+  position: relative;
+  margin-right: -80px;
+}
+
+.search-input {
+  width: 100%;
+  padding-left: 50px;
+  border: none;
+  border-radius: 10px;
+  font-size: 18px;
+  outline: none;
+  height: 40px;
+  width: 300px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 26px;
+  color: #666;
+}
