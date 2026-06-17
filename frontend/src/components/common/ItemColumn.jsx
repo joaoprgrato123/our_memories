@@ -12,9 +12,10 @@ export default function ItemColumn({
   showCheckbox,
   checkedItems = {},
   checkboxIcon,
-  setCheckedItems,
   sortOptions = [],
   fields,
+  onSave,
+  onDelete,
 }) {
   const colors = {
     first: {
@@ -43,10 +44,10 @@ export default function ItemColumn({
   const [showSort, setShowSort] = useState(false);
   const sortRef = useRef(null);
   const isResources =
-    Array.isArray(items) && typeof items[0] === "object" && "link" in items[0];
+    Array.isArray(items) && typeof items[0] === "object" && "icon" in items[0];
   const [sortSelected, setSortSelected] = useState(sortOptions?.[0]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState("add"); // add | edit
+  const [modalMode, setModalMode] = useState("add");
   const [selectedItem, setSelectedItem] = useState(null);
 
   useEffect(() => {
@@ -69,6 +70,7 @@ export default function ItemColumn({
           <button
             className="action-button"
             onClick={() => {
+              setSelectedItem(null);
               setModalMode("add");
               setModalOpen(true);
             }}
@@ -127,11 +129,11 @@ export default function ItemColumn({
           </div>
         ) : (
           (items || []).map((item, index) => {
-            const isChecked = !!checkedItems?.[item];
+            const isChecked = !!checkedItems?.[item.id];
 
             return (
               <div
-                key={item}
+                key={item.id}
                 className="item-card-container"
                 style={{
                   backgroundColor: index % 2 === 0 ? oddColor : evenColor,
@@ -143,17 +145,11 @@ export default function ItemColumn({
                 }}
               >
                 <ItemCard
-                  title={item}
+                  title={item.name ?? item.title}
                   showCheckbox={showCheckbox}
                   checked={isChecked}
                   checkboxColor={titleColor}
                   checkboxIcon={checkboxIcon}
-                  onToggle={() =>
-                    setCheckedItems?.((prev) => ({
-                      ...prev,
-                      [item]: !prev?.[item],
-                    }))
-                  }
                 />
               </div>
             );
@@ -162,9 +158,11 @@ export default function ItemColumn({
       </div>
 
       <ItemModal
-        key={selectedItem || "new"}
+        key={selectedItem?.id || "new"}
         open={modalOpen}
         onClose={() => setModalOpen(false)}
+        onSave={onSave}
+        onDelete={onDelete}
         mode={modalMode}
         setMode={setModalMode}
         item={selectedItem}

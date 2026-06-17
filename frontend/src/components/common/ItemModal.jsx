@@ -3,6 +3,8 @@ import { useState } from "react";
 export default function ItemModal({
   open,
   onClose,
+  onSave,
+  onDelete,
   mode = "add",
   item,
   colors,
@@ -11,7 +13,6 @@ export default function ItemModal({
   checkboxIcon,
   columnTitle,
 }) {
-  const [formData, setFormData] = useState(item || {});
   const [hoverValue, setHoverValue] = useState(null);
 
   const isView = mode === "view";
@@ -33,6 +34,32 @@ export default function ItemModal({
 
   const headerFields = fields.filter((f) => f.section === "header");
   const bodyFields = fields.filter((f) => f.section === "body");
+
+  const toISODate = (dateStr) => {
+    if (!dateStr) return null;
+    return new Date(dateStr).toISOString();
+  };
+
+  const toDateInput = (value) => {
+    if (!value) return "";
+    return new Date(value).toISOString().split("T")[0];
+  };
+
+  const normalizeItem = (item) => {
+    if (!item) return {};
+
+    const normalized = { ...item };
+
+    fields.forEach((f) => {
+      if (f.type === "date" && item[f.name]) {
+        normalized[f.name] = toDateInput(item[f.name]);
+      }
+    });
+
+    return normalized;
+  };
+
+  const [formData, setFormData] = useState(() => normalizeItem(item));
 
   if (!open) return null;
 
@@ -87,7 +114,7 @@ export default function ItemModal({
                   left: 0,
                   width: "50%",
                   overflow: "hidden",
-                  color: "black",
+                  color: "inherit",
                 }}
               >
                 ★
@@ -186,16 +213,31 @@ export default function ItemModal({
           );
         } else {
           elements.push(
-            <input
-              key={field.name}
-              type={field.type}
-              min={0}
-              placeholder={field.placeholder}
-              title={field.placeholder}
-              defaultValue={item?.[field.name] || ""}
-              className={field.title ? "title-modal" : ""}
-              {...inputProps}
-            />,
+            <>
+              <input
+                key={field.name}
+                type={field.type}
+                min={0}
+                placeholder={field.placeholder}
+                title={field.placeholder}
+                value={formData?.[field.name] ?? ""}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    [field.name]:
+                      field.type === "number"
+                        ? Number(e.target.value)
+                        : e.target.value,
+                  }))
+                }
+                className={field.title ? "title-modal" : ""}
+                {...inputProps}
+              />
+
+              {field.suffix && (
+                <span style={{ marginLeft: "6px" }}>{field.suffix}</span>
+              )}
+            </>,
           );
         }
 
@@ -229,16 +271,16 @@ export default function ItemModal({
       >
         <div className="modal-content">
           {/* HEADER */}
-         {headerFields.length > 0 && (
-  <div
-    className="title-border-wrapper"
-    style={{ background: colors.title }}
-  >
-    <div className="title-container-modal">
-      {renderFields(headerFields)}
-    </div>
-  </div>
-)}
+          {headerFields.length > 0 && (
+            <div
+              className="title-border-wrapper"
+              style={{ background: colors.title }}
+            >
+              <div className="title-container-modal">
+                {renderFields(headerFields)}
+              </div>
+            </div>
+          )}
 
           {/* BODY */}
           <div
@@ -257,17 +299,61 @@ export default function ItemModal({
                   >
                     Edit ✎
                   </button>
-                  <button className="danger">Delete ☓</button>
+                  <button
+                    className="danger"
+                    onClick={async () => {
+                      await onDelete?.(formData.id);
+                      onClose?.();
+                    }}
+                  >
+                    Delete ☓
+                  </button>
                 </>
               ) : (
                 <>
                   <button
                     className="primary"
                     style={{ background: colors.title }}
+                    onClick={async () => {
+                      const buildPayload = (formData) => {
+                        const payload = { ...formData };
+
+                        fields.forEach((f) => {
+                          if (f.type === "date") {
+                            payload[f.name] = toISODate(payload[f.name]);
+                          }
+                        });
+
+                        return payload;
+                      };
+                      const payload = buildPayload(formData);
+
+                      await onSave?.(
+                        {
+                          ...payload,
+                          ...(columnTitle === "Juju" || columnTitle === "Dudi"
+                            ? { owner: columnTitle.toLowerCase() }
+                            : { status: columnTitle.toLowerCase() }),
+                        },
+                        mode,
+                      );
+
+                      onClose?.();
+                    }}
                   >
                     {isEdit ? "Save ✓" : "Add +"}
                   </button>
-                  {isEdit && <button className="danger">Delete ☓</button>}
+                  {isEdit && (
+                    <button
+                      className="danger"
+                      onClick={async () => {
+                        await onDelete?.(formData.id);
+                        onClose?.();
+                      }}
+                    >
+                      Delete ☓
+                    </button>
+                  )}
                 </>
               )}
             </div>

@@ -360,6 +360,10 @@ input[type="url"] {
   width: 350px;
 }
 
+input[type="number"] {
+  width: 100px;
+}
+
 input[placeholder="Icon"] {
   width: 50px;
 }

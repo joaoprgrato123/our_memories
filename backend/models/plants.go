@@ -1,15 +1,13 @@
 package models
 
-import "time"
-
 type Plant struct {
-	ID        int64     `json:"id"`
-	Name      string    `json:"name"`
-	Genre     string    `json:"genre"`
-	StartDate time.Time `json:"start_date"`
-	EndDate   time.Time `json:"end_date"`
-	AddedDate time.Time `json:"added_date"`
-	Score     time.Time `json:"score"`
-	Duration  string    `json:"duration"`
-	Status    string    `json:"status"`
+	ID           int64     `json:"id"`
+	Name         string    `json:"name"`
+	SeedSeason   string    `json:"seed_season"`
+	FruitSeason  string    `json:"fruit_season"`
+	Owned        bool      `json:"owned"`
+	Amount       int64     `json:"amount"`
+	Score        float64   `json:"score"`
+	Planted      bool      `json:"planted"`
+	Status       string    `json:"status"`
 }

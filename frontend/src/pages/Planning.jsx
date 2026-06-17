@@ -1,102 +1,152 @@
 import Header from "../components/common/Header";
 import ItemColumn from "../components/common/ItemColumn";
 import { useOutletContext } from "react-router-dom";
-
-const someday = ["Beach Trip", "Snow Trip", "Swim"];
-const planned = ["First Anniversary", "Lisbon Weekend", "Iberanime"];
-const ourMemories = ["Lisbon Trip", "Aveiro Weekend"];
-const sortOptions = ["Name", "Date", "Location"];
-const fields = [
-  {
-    name: "title",
-    placeholder: "Title",
-    type: "text",
-    section: "header",
-    title: true,
-  },
-
-  {
-    name: "occursStart",
-    placeholder: "Occurs Start Date",
-    type: "date",
-    section: "header",
-    group: "1",
-  },
-  {
-    name: "occursEnd",
-    placeholder: "Occurs End Date",
-    type: "date",
-    section: "header",
-    group: "1",
-  },
-
-  {
-    name: "location",
-    placeholder: "Location",
-    type: "text",
-    section: "header",
-  },
-
-  {
-    name: "addedDate",
-    placeholder: "Added Date",
-    type: "date",
-    section: "body",
-    label: true,
-  },
-
-  {
-    name: "startDate",
-    placeholder: "Start Date",
-    type: "date",
-    section: "body",
-    group: "2",
-    label: true,
-  },
-  {
-    name: "endDate",
-    placeholder: "End Date",
-    type: "date",
-    section: "body",
-    group: "2",
-    label: true,
-  },
-
-  {
-    name: "hotel",
-    placeholder: "Hotel",
-    type: "text",
-    section: "body",
-    group: "3",
-    label: true,
-  },
-  {
-    name: "category",
-    placeholder: "Category",
-    type: "text",
-    section: "body",
-    group: "3",
-    label: true,
-  },
-
-  {
-    name: "images",
-    placeholder: "Images URL",
-    type: "url",
-    section: "body",
-    group: "4",
-  },
-  {
-    name: "documents",
-    placeholder: "Documents URL",
-    type: "url",
-    section: "body",
-    group: "4",
-  },
-];
+import { useEffect, useState } from "react";
 
 export default function Planning() {
   const theme = useOutletContext();
+
+  const [plans, setPlans] = useState([]);
+
+  const refreshPlans = async () => {
+    const res = await fetch("http://localhost:8080/plans");
+    const json = await res.json();
+
+    const normalized = Array.isArray(json) ? json : json.plans;
+    setPlans(normalized || []);
+  };
+
+  useEffect(() => {
+    const load = async () => {
+      const res = await fetch("http://localhost:8080/plans");
+      const data = await res.json();
+
+      const normalized = Array.isArray(data) ? data : data.plans;
+      setPlans(normalized || []);
+    };
+
+    load().catch((err) => console.error("Error fetching plans:", err));
+  }, []);
+
+  const handleSave = async (data, mode) => {
+    if (mode === "edit") {
+      await fetch(`http://localhost:8080/plans/${data.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+    } else {
+      await fetch(`http://localhost:8080/plans`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+    }
+
+    await refreshPlans();
+  };
+
+  const handleDelete = async (id) => {
+    await fetch(`http://localhost:8080/plans/${id}`, {
+      method: "DELETE",
+    });
+
+    await refreshPlans();
+  };
+
+  const someday = plans.filter((p) => p.status === "someday");
+  const planned = plans.filter((p) => p.status === "planned");
+  const ourMemories = plans.filter((p) => p.status === "our memories");
+  const sortOptions = ["Name", "Date", "Location"];
+  const fields = [
+    {
+      name: "title",
+      placeholder: "Title",
+      type: "text",
+      section: "header",
+      title: true,
+    },
+
+    {
+      name: "occurs_start",
+      placeholder: "Occurs Start Date",
+      type: "date",
+      section: "header",
+      group: "1",
+    },
+    {
+      name: "occurs_end",
+      placeholder: "Occurs End Date",
+      type: "date",
+      section: "header",
+      group: "1",
+    },
+
+    {
+      name: "location",
+      placeholder: "Location",
+      type: "text",
+      section: "header",
+    },
+
+    {
+      name: "added_date",
+      placeholder: "Added Date",
+      type: "date",
+      section: "body",
+      label: true,
+    },
+
+    {
+      name: "achieved_date_start",
+      placeholder: "Start Date",
+      type: "date",
+      section: "body",
+      group: "2",
+      label: true,
+    },
+    {
+      name: "achieved_date_end",
+      placeholder: "End Date",
+      type: "date",
+      section: "body",
+      group: "2",
+      label: true,
+    },
+
+    {
+      name: "hotel",
+      placeholder: "Hotel",
+      type: "text",
+      section: "body",
+      group: "3",
+      label: true,
+    },
+    {
+      name: "category",
+      placeholder: "Category",
+      type: "text",
+      section: "body",
+      group: "3",
+      label: true,
+    },
+
+    {
+      name: "images",
+      placeholder: "Images URL",
+      type: "url",
+      section: "body",
+      group: "4",
+    },
+    {
+      name: "pdf",
+      placeholder: "Documents URL",
+      type: "url",
+      section: "body",
+      group: "4",
+    },
+  ];
+
   return (
     <>
       <Header title="Planning" placeholder="Search event..." />
@@ -109,6 +159,8 @@ export default function Planning() {
           variant="first"
           sortOptions={sortOptions}
           fields={fields}
+          onSave={handleSave}
+          onDelete={handleDelete}
         />
 
         <ItemColumn
@@ -118,6 +170,8 @@ export default function Planning() {
           variant="second"
           sortOptions={sortOptions}
           fields={fields}
+          onSave={handleSave}
+          onDelete={handleDelete}
         />
 
         <ItemColumn
@@ -127,6 +181,8 @@ export default function Planning() {
           variant="third"
           sortOptions={sortOptions}
           fields={fields}
+          onSave={handleSave}
+          onDelete={handleDelete}
         />
       </div>
     </>

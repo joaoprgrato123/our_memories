@@ -12,7 +12,7 @@ export default function ItemCard({
 
       {showCheckbox && (
         <label className="custom-checkbox">
-          <input type="checkbox" checked={checked} onChange={onToggle} />
+          <input type="checkbox" checked={checked} onChange={onToggle} readOnly/>
 
           <span
             className="checkmark"
