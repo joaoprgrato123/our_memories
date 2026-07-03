@@ -34,7 +34,7 @@ func (s *plantsService) GetByID(id int64) (models.Plant, error) {
 func (s *plantsService) Create(plant models.Plant) (models.Plant, error) {
 	// Validation
 	if plant.Name == "" {
-		return models.Plant{}, errors.New("card name is required")
+		return models.Plant{}, errors.New("plant name is required")
 	}
 
 	// Get existing cards
@@ -62,7 +62,7 @@ func (s *plantsService) Update(plant models.Plant) (models.Plant, error) {
 
 	// Validation
 	if plant.Name == "" {
-		return models.Plant{}, errors.New("card name is required")
+		return models.Plant{}, errors.New("plant name is required")
 	}
 
 	return s.repo.Update(plant)

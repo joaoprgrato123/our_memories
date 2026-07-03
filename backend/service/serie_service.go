@@ -34,7 +34,7 @@ func (s *serieService) GetByID(id int64) (models.Serie, error) {
 func (s *serieService) Create(serie models.Serie) (models.Serie, error) {
 	// Validation
 	if serie.Title == "" {
-		return models.Serie{}, errors.New("card name is required")
+		return models.Serie{}, errors.New("serie name is required")
 	}
 
 	// Get existing cards
@@ -62,7 +62,7 @@ func (s *serieService) Update(serie models.Serie) (models.Serie, error) {
 
 	// Validation
 	if serie.Title == "" {
-		return models.Serie{}, errors.New("card name is required")
+		return models.Serie{}, errors.New("serie name is required")
 	}
 
 	return s.repo.Update(serie)
