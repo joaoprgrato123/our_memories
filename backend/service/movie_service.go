@@ -34,7 +34,7 @@ func (s *movieService) GetByID(id int64) (models.Movie, error) {
 func (s *movieService) Create(movie models.Movie) (models.Movie, error) {
 	// Validation
 	if movie.Title == "" {
-		return models.Movie{}, errors.New("card name is required")
+		return models.Movie{}, errors.New("movie name is required")
 	}
 
 	// Get existing cards
@@ -62,7 +62,7 @@ func (s *movieService) Update(movie models.Movie) (models.Movie, error) {
 
 	// Validation
 	if movie.Title == "" {
-		return models.Movie{}, errors.New("card name is required")
+		return models.Movie{}, errors.New("movie name is required")
 	}
 
 	return s.repo.Update(movie)

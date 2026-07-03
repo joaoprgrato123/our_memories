@@ -4,141 +4,140 @@ import (
 	"encoding/json"
 	"os"
 	"our-memories/models"
-	"time"
 )
 
 // interface
-type MovieRepository interface {
-	GetAll() ([]models.Movie, error)
-	GetByID(id int64) (models.Movie, error)
-	Create(movie models.Movie) (models.Movie, error)
-	Update(movie models.Movie) (models.Movie, error)
+type ResourceRepository interface {
+	GetAll() ([]models.Resource, error)
+	GetByID(id int64) (models.Resource, error)
+	Create(resource models.Resource) (models.Resource, error)
+	Update(resource models.Resource) (models.Resource, error)
 	Delete(id int64) error
 }
 
 // constructor
-func NewMovieRepository(db *models.JSONStorage) MovieRepository {
-	return &movieRepository{db: db}
+func NewResourceRepository(db *models.JSONStorage) ResourceRepository {
+	return &resourceRepository{db: db}
 }
 
 // implementation
-type movieRepository struct {
+type resourceRepository struct {
 	db *models.JSONStorage
 }
 
-func (r *movieRepository) GetAll() ([]models.Movie, error) {
+func (r *resourceRepository) GetAll() ([]models.Resource, error) {
 	var data models.AppData
 
 	file, err := os.ReadFile(r.db.FilePath)
 	if err != nil {
-		return []models.Movie{}, err
+		return []models.Resource{}, err
 	}
 
 	if len(file) == 0 {
-		return []models.Movie{}, ErrFileEmpty
+		return []models.Resource{}, ErrFileEmpty
 	}
 
 	if err := json.Unmarshal(file, &data); err != nil {
-		return []models.Movie{}, err
+		return []models.Resource{}, err
 	}
 
-	return data.Movies, nil
+	return data.Resources, nil
 }
 
-func (r *movieRepository) GetByID(id int64) (models.Movie, error) {
+func (r *resourceRepository) GetByID(id int64) (models.Resource, error) {
 	var data models.AppData
 
 	file, err := os.ReadFile(r.db.FilePath)
 	if err != nil {
-		return models.Movie{}, err
+		return models.Resource{}, err
 	}
 
 	if len(file) == 0 {
-		return models.Movie{}, ErrCardNotFound
+		return models.Resource{}, ErrCardNotFound
 	}
 
 	if err := json.Unmarshal(file, &data); err != nil {
-		return models.Movie{}, err
+		return models.Resource{}, err
 	}
 
-	for _, movie := range data.Movies {
-		if movie.ID == id {
-			return movie, nil
+	for _, resource := range data.Resources {
+		if resource.ID == id {
+			return resource, nil
 		}
 	}
 
-	return models.Movie{}, nil
+	return models.Resource{}, nil
 }
 
-func (r *movieRepository) Create(movie models.Movie) (models.Movie, error) {
+func (r *resourceRepository) Create(resource models.Resource) (models.Resource, error) {
 	var data models.AppData
 
 	file, err := os.ReadFile(r.db.FilePath)
 	if err != nil {
-		return models.Movie{}, err
+		return models.Resource{}, err
 	}
 
 	if len(file) > 0 {
 		if err := json.Unmarshal(file, &data); err != nil {
-			return models.Movie{}, err
+			return models.Resource{}, err
 		}
 	}
 
-	data.Movies = append(data.Movies, movie)
+	data.Resources = append(data.Resources, resource)
 
 	// transform data into json format with pretty ident
 	jsonData, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
-		return models.Movie{}, err
+		return models.Resource{}, err
 	}
 
 	// write into file the new jsondata with read write permissions
 	if err := os.WriteFile(r.db.FilePath, jsonData, 0644); err != nil {
-		return models.Movie{}, err
+		return models.Resource{}, err
 	}
 
-	return movie, nil
+	return resource, nil
 }
 
-func (r *movieRepository) Update(movie models.Movie) (models.Movie, error) {
+func (r *resourceRepository) Update(resource models.Resource) (models.Resource, error) {
 	var data models.AppData
 
 	file, err := os.ReadFile(r.db.FilePath)
 	if err != nil {
-		return models.Movie{}, err
+		return models.Resource{}, err
 	}
 
 	if err := json.Unmarshal(file, &data); err != nil {
-		return models.Movie{}, err
+		return models.Resource{}, err
 	}
 
 	found := false
 
-	for i, p := range data.Movies {
-		if p.ID == movie.ID {
-			data.Movies[i] = movie
+	for i, p := range data.Resources {
+		if p.ID == resource.ID {
+			data.Resources[i] = resource
 			found = true
 			break
 		}
 	}
 
 	if !found {
-		return models.Movie{}, os.ErrNotExist
+		return models.Resource{}, os.ErrNotExist
 	}
 
 	updated, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
-		return models.Movie{}, err
+		return models.Resource{}, err
 	}
 
 	if err := os.WriteFile(r.db.FilePath, updated, 0644); err != nil {
-		return models.Movie{}, err
+		return models.Resource{}, err
 	}
 
-	return movie, nil
+	return resource, nil
 }
 
-func (r *movieRepository) Delete(id int64) error {
+func (r *resourceRepository) Delete(id int64) error {
 	var data models.AppData
 
 	file, err := os.ReadFile(r.db.FilePath)
@@ -151,7 +150,7 @@ func (r *movieRepository) Delete(id int64) error {
 	}
 
 	index := -1
-	for i, p := range data.Movies {
+	for i, p := range data.Resources {
 		if p.ID == id {
 			index = i
 			break
@@ -163,7 +162,7 @@ func (r *movieRepository) Delete(id int64) error {
 	}
 
 	// remove element
-	data.Movies = append(data.Movies[:index], data.Movies[index+1:]...)
+	data.Resources = append(data.Resources[:index], data.Resources[index+1:]...)
 
 	updated, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
@@ -171,10 +170,4 @@ func (r *movieRepository) Delete(id int64) error {
 	}
 
 	return os.WriteFile(r.db.FilePath, updated, 0644)
-
-}
-
-// function to return a address of time since most dates are pointers and only accept an adress of a variable
-func timePtr(t time.Time) *time.Time {
-	return &t
 }

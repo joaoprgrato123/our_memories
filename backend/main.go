@@ -7,12 +7,20 @@ import (
 	"our-memories/models"
 	"our-memories/repository"
 	"our-memories/service"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
 	// Storage initialization
 	storage := &models.JSONStorage{
 		FilePath: "data.json",
+	}
+
+	//load .env file
+	if err := godotenv.Load(); err != nil {
+		log.Fatal(" error loading .env file")
+
 	}
 
 	mux := http.NewServeMux()
@@ -23,6 +31,7 @@ func main() {
 	serieRepo := repository.NewSerieRepository(storage)
 	mtgRepo := repository.NewMTGRepository(storage)
 	plantRepo := repository.NewPlantRepository(storage)
+	resourceRepo := repository.NewResourceRepository(storage)
 
 	// Services
 	planService := service.NewPlanService(planRepo)
@@ -30,6 +39,7 @@ func main() {
 	serieService := service.NewSerieService(serieRepo)
 	mtgService := service.NewMTGService(mtgRepo)
 	plantService := service.NewPlantService(plantRepo)
+	resourceService := service.NewResourceService(resourceRepo)
 
 	// Handlers
 	planHandler := handler.NewPlanHandler(planService)
@@ -37,6 +47,8 @@ func main() {
 	serieHandler := handler.NewSerieHandler(serieService)
 	mtgHandler := handler.NewMTGHandler(mtgService)
 	plantHandler := handler.NewPlantHandler(plantService)
+	resourceHandler := handler.NewResourceHandler(resourceService)
+	userHandler := handler.NewUserHandler()
 
 	// Routes
 	// plan routes
@@ -73,6 +85,16 @@ func main() {
 	mux.HandleFunc("GET /plants/{id}", plantHandler.GetByID)
 	mux.HandleFunc("PUT /plants/{id}", plantHandler.Update)
 	mux.HandleFunc("DELETE /plants/{id}", plantHandler.Delete)
+
+	//resource routes
+	mux.HandleFunc("GET /resources", resourceHandler.GetAll)
+	mux.HandleFunc("POST /resources", resourceHandler.Create)
+	mux.HandleFunc("GET /resources/{id}", resourceHandler.GetByID)
+	mux.HandleFunc("PUT /resources/{id}", resourceHandler.Update)
+	mux.HandleFunc("DELETE /resources/{id}", resourceHandler.Delete)
+
+	//user routes
+	mux.HandleFunc("Post /login", userHandler.Login)
 
 	// Wrap mux with CORS middleware
 	handler := corsMiddleware(mux)

@@ -34,7 +34,7 @@ func (s *planService) GetByID(id int64) (models.Plan, error) {
 func (s *planService) Create(plan models.Plan) (models.Plan, error) {
 	// Validation
 	if plan.Title == "" {
-		return models.Plan{}, errors.New("card name is required")
+		return models.Plan{}, errors.New("plan name is required")
 	}
 
 	// Get existing cards
@@ -62,7 +62,7 @@ func (s *planService) Update(plan models.Plan) (models.Plan, error) {
 
 	// Validation
 	if plan.Title == "" {
-		return models.Plan{}, errors.New("card name is required")
+		return models.Plan{}, errors.New("plan name is required")
 	}
 
 	return s.repo.Update(plan)
