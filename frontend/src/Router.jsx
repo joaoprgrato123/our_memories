@@ -7,20 +7,30 @@ import Garden from "./pages/Garden";
 import MTG from "./pages/Magic";
 import Resources from "./pages/Resources";
 import { createBrowserRouter } from "react-router-dom";
+import ProtectedRoute from "./components/common/ProtectedRoute";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <AppLayout />,
     children: [
-      { index: true, element: <Login /> },
-      { path: "login", element: <Login /> },
-      { path: "planning", element: <Planning /> },
-      { path: "movies", element: <Movies /> },
-      { path: "tvshows", element: <TVShows /> },
-      { path: "garden", element: <Garden /> },
-      { path: "mtg", element: <MTG /> },
-      { path: "resources", element: <Resources /> },
+      {
+        path: "login",
+        element: <Login />,
+      },
+
+      {
+        element: <ProtectedRoute />,
+        children: [
+          { index: true, element: <Planning /> },
+          { path: "planning", element: <Planning /> },
+          { path: "movies", element: <Movies /> },
+          { path: "tvshows", element: <TVShows /> },
+          { path: "garden", element: <Garden /> },
+          { path: "mtg", element: <MTG /> },
+          { path: "resources", element: <Resources /> },
+        ],
+      },
     ],
   },
 ]);
