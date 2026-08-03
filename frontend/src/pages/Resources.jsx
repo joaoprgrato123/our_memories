@@ -1,9 +1,65 @@
 import Header from "../components/common/Header";
 import ItemColumn from "../components/common/ItemColumn";
 import { useOutletContext } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 export default function Resources() {
   const theme = useOutletContext();
+
+  const [resources, setResources] = useState([]);
+
+  const refreshResources = async () => {
+    const res = await fetch("http://localhost:8080/resources");
+    const json = await res.json();
+
+    const normalized = Array.isArray(json) ? json : json.resources;
+
+    setResources(normalized || []);
+  };
+
+  useEffect(() => {
+    const load = async () => {
+      const res = await fetch("http://localhost:8080/resources");
+      const data = await res.json();
+
+      const normalized = Array.isArray(data) ? data : data.resources;
+
+      setResources(normalized || []);
+    };
+
+    load().catch((err) => console.error("Error fetching resources:", err));
+  }, []);
+
+  const handleSave = async (data, mode) => {
+    if (mode === "edit") {
+      await fetch(`http://localhost:8080/resources/${data.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+    } else {
+      await fetch("http://localhost:8080/resources", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+    }
+
+    await refreshResources();
+  };
+
+  const handleDelete = async (id) => {
+    await fetch(`http://localhost:8080/resources/${id}`, {
+      method: "DELETE",
+    });
+
+    await refreshResources();
+  };
+
   const fields = [
     {
       name: "name",
@@ -12,15 +68,13 @@ export default function Resources() {
       section: "body",
       title: true,
     },
-
     {
       name: "icon",
       placeholder: "Icon",
-      type: "text",
+      type: "emoji",
       section: "body",
       label: true,
     },
-
     {
       name: "link",
       placeholder: "Link",
@@ -29,6 +83,7 @@ export default function Resources() {
       label: true,
     },
   ];
+
   return (
     <>
       <Header title="Resources" placeholder="Search resource..." />
@@ -39,31 +94,12 @@ export default function Resources() {
       >
         <ItemColumn
           title=""
+          items={resources}
           theme={theme}
           fields={fields}
           variant="first"
-          items={[
-            {
-              label: "Tasty Finds",
-              icon: "🍴",
-              link: "https://tastyfinds.vercel.app/",
-            },
-            {
-              label: "Charts",
-              icon: "📊",
-              link: "https://docs.google.com/spreadsheets/d/1C_rgl7TwJAr4wddUhCmYtVp9zp-TCQQEpON-OukPQ4w/edit",
-            },
-            {
-              label: "Finance",
-              icon: "💶",
-              link: "https://docs.google.com/spreadsheets/d/1quejREVkPmgC3L3NXhT_PAaVtLOlEB-7NhcIgcCjyhI/edit",
-            },
-            {
-              label: "Chores",
-              icon: "🧹️",
-              link: "https://docs.google.com/spreadsheets/d/1M8SKk5ETEpIc3XEkggC4IrB7fq3DpnhwnWnU8zpfPfw/edit",
-            },
-          ]}
+          onSave={handleSave}
+          onDelete={handleDelete}
         />
       </div>
     </>
