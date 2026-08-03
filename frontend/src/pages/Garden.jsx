@@ -15,75 +15,6 @@ export default function Garden() {
     "Seed Season",
   ];
 
-  const [plants, setPlants] = useState([]);
-
-  const refreshPlants = async () => {
-    const res = await fetch("http://localhost:8080/plants");
-    const json = await res.json();
-
-    const normalized = Array.isArray(json) ? json : json.plants;
-    
-    setPlants(normalized || []);
-
-    const initialChecked = {};
-
-    (normalized || []).forEach((plant) => {
-      initialChecked[plant.id] = plant.owned;
-    });
-
-    setCheckedItems(initialChecked);
-  };
-
-  useEffect(() => {
-    const load = async () => {
-      const res = await fetch("http://localhost:8080/plants");
-      const data = await res.json();
-
-      const normalized = Array.isArray(data) ? data : data.plants;
-
-      setPlants(normalized || []);
-
-      const initialChecked = {};
-
-      (normalized || []).forEach((plant) => {
-        initialChecked[plant.id] = plant.owned;
-      });
-
-      setCheckedItems(initialChecked);
-    };
-
-    load().catch((err) => console.error("Error fetching plants:", err));
-  }, []);
-
-  const handleSave = async (data, mode) => {
-    if (mode === "edit") {
-      await fetch(`http://localhost:8080/plants/${data.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-    } else {
-      await fetch(`http://localhost:8080/plants`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-    }
-
-    await refreshPlants();
-  };
-
-  const handleDelete = async (id) => {
-    await fetch(`http://localhost:8080/plants/${id}`, {
-      method: "DELETE",
-    });
-
-    await refreshPlants();
-  };
-
-  const seasonal = plants.filter((p) => p.status === "seasonal");
-  const permanent = plants.filter((p) => p.status === "permanent");
-
   const fields = [
     {
       name: "name",
@@ -145,9 +76,92 @@ export default function Garden() {
     },
   ];
 
+  const [plants, setPlants] = useState([]);
+  const [search, setSearch] = useState("");
+
+  const searchField = fields[0]?.name;
+  
+  const filteredPlants = plants.filter((plant) =>
+    String(plant[searchField] ?? "")
+      .toLowerCase()
+      .includes(search.toLowerCase()),
+  );
+
+  const refreshPlants = async () => {
+    const res = await fetch("http://localhost:8080/plants");
+    const json = await res.json();
+
+    const normalized = Array.isArray(json) ? json : json.plants;
+
+    setPlants(normalized || []);
+
+    const initialChecked = {};
+
+    (normalized || []).forEach((plant) => {
+      initialChecked[plant.id] = plant.owned;
+    });
+
+    setCheckedItems(initialChecked);
+  };
+
+  useEffect(() => {
+    const load = async () => {
+      const res = await fetch("http://localhost:8080/plants");
+      const data = await res.json();
+
+      const normalized = Array.isArray(data) ? data : data.plants;
+
+      setPlants(normalized || []);
+
+      const initialChecked = {};
+
+      (normalized || []).forEach((plant) => {
+        initialChecked[plant.id] = plant.owned;
+      });
+
+      setCheckedItems(initialChecked);
+    };
+
+    load().catch((err) => console.error("Error fetching plants:", err));
+  }, []);
+
+  const handleSave = async (data, mode) => {
+    if (mode === "edit") {
+      await fetch(`http://localhost:8080/plants/${data.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+    } else {
+      await fetch(`http://localhost:8080/plants`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+    }
+
+    await refreshPlants();
+  };
+
+  const handleDelete = async (id) => {
+    await fetch(`http://localhost:8080/plants/${id}`, {
+      method: "DELETE",
+    });
+
+    await refreshPlants();
+  };
+
+  const seasonal = filteredPlants.filter((p) => p.status === "seasonal");
+  const permanent = filteredPlants.filter((p) => p.status === "permanent");
+
   return (
     <>
-      <Header title="Garden" placeholder="Search plant..." />
+      <Header
+        title="Garden"
+        placeholder="Search plant..."
+        search={search}
+        onSearch={setSearch}
+      />
 
       <div className="page-container" style={{ background: theme.container }}>
         <ItemColumn

@@ -105,5 +105,31 @@
       "planted": true,
       "status": "seasonal"
     }
+  ],
+  "resources": [
+    {
+      "id": 1,
+      "name": "Tasty Finds",
+      "link": "https://tastyfinds.vercel.app/",
+      "icon": "🍴"
+    },
+    {
+      "id": 2,
+      "name": "Charts",
+      "link": "https://docs.google.com/spreadsheets/d/1C_rgl7TwJAr4wddUhCmYtVp9zp-TCQQEpON-OukPQ4w/edit",
+      "icon": "📊"
+    },
+    {
+      "id": 3,
+      "name": "Finance",
+      "link": "https://docs.google.com/spreadsheets/d/1quejREVkPmgC3L3NXhT_PAaVtLOlEB-7NhcIgcCjyhI/edit",
+      "icon": "💶"
+    },
+    {
+      "id": 4,
+      "name": "Chores",
+      "link": "https://docs.google.com/spreadsheets/d/1M8SKk5ETEpIc3XEkggC4IrB7fq3DpnhwnWnU8zpfPfw/edit",
+      "icon": "🧹️"
+    }
   ]
 }

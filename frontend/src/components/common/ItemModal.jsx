@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import EmojiPicker from "emoji-picker-react";
 
 export default function ItemModal({
   open,
@@ -14,6 +15,8 @@ export default function ItemModal({
   columnTitle,
 }) {
   const [hoverValue, setHoverValue] = useState(null);
+  const emojiPickerRef = useRef(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const isView = mode === "view";
   const isEdit = mode === "edit";
@@ -34,6 +37,23 @@ export default function ItemModal({
 
   const headerFields = fields.filter((f) => f.section === "header");
   const bodyFields = fields.filter((f) => f.section === "body");
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        emojiPickerRef.current &&
+        !emojiPickerRef.current.contains(event.target)
+      ) {
+        setShowEmojiPicker(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const toISODate = (dateStr) => {
     if (!dateStr) return null;
@@ -209,6 +229,54 @@ export default function ItemModal({
             <div key={field.name} className="static-field">
               {field.label && <label>{field.placeholder}:</label>}
               <span>{columnTitle}</span>
+            </div>,
+          );
+        } else if (field.type === "emoji") {
+          elements.push(
+            <div
+              key={field.name}
+              ref={emojiPickerRef}
+              style={{ position: "relative" }}
+            >
+              <button
+                type="button"
+                className="emoji-input"
+                onClick={() => {
+                  if (!isView) {
+                    setShowEmojiPicker((prev) => !prev);
+                  }
+                }}
+                style={{
+                  cursor: isView ? "default" : "pointer",
+                  fontSize: "24px",
+                }}
+              >
+                {formData?.[field.name] || "😀"}
+              </button>
+
+              {showEmojiPicker && !isView && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "100%",
+                    left: 0,
+                    zIndex: 1000,
+                  }}
+                >
+                  <EmojiPicker
+                    theme="auto"
+                    emojiStyle="native"
+                    onEmojiClick={(emojiData) => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        [field.name]: emojiData.emoji,
+                      }));
+
+                      setShowEmojiPicker(false);
+                    }}
+                  />
+                </div>
+              )}
             </div>,
           );
         } else {

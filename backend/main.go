@@ -94,7 +94,7 @@ func main() {
 	mux.HandleFunc("DELETE /resources/{id}", resourceHandler.Delete)
 
 	//user routes
-	mux.HandleFunc("Post /login", userHandler.Login)
+	mux.HandleFunc("POST /login", userHandler.Login)
 
 	// Wrap mux with CORS middleware
 	handler := corsMiddleware(mux)

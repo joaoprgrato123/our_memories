@@ -7,6 +7,7 @@ export default function Movies() {
   const theme = useOutletContext();
 
   const [movies, setMovies] = useState([]);
+  const [search, setSearch] = useState("");
 
   const refreshMovies = async () => {
     const res = await fetch("http://localhost:8080/movies");
@@ -55,10 +56,8 @@ export default function Movies() {
     await refreshMovies();
   };
 
-  const toWatch = movies.filter((m) => m.status === "to watch");
-  const seen = movies.filter((m) => m.status === "seen");
-
   const sortOptions = ["Title", "Genre", "Score", "Duration", "Added Date"];
+
   const fields = [
     {
       name: "title",
@@ -115,9 +114,25 @@ export default function Movies() {
     },
   ];
 
+  const searchField = fields[0]?.name;
+
+  const filteredMovies = movies.filter((movie) =>
+    String(movie[searchField] ?? "")
+      .toLowerCase()
+      .includes(search.toLowerCase()),
+  );
+
+  const toWatch = filteredMovies.filter((m) => m.status === "to watch");
+  const seen = filteredMovies.filter((m) => m.status === "seen");
+
   return (
     <>
-      <Header title="Movies" placeholder="Search movie..." />
+      <Header
+        title="Movies"
+        placeholder="Search movie..."
+        search={search}
+        onSearch={setSearch}
+      />
 
       <div className="page-container" style={{ background: theme.container }}>
         <ItemColumn

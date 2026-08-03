@@ -19,6 +19,12 @@ body,
 input,
 button {
   font-family: "Kavoon", serif;
+  transition: all 0.3s ease;
+}
+
+input:focus {
+  outline: none;
+  border-color: white;
 }
 
 .login-container label,
@@ -32,13 +38,19 @@ button {
   justify-items: center;
 }
 
-.login-container .field-row input {
-  background: white;
-}
-
 .login-container .field-row {
   gap: 20px;
   padding: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.login-container .field-row label {
+  width: 150px;
+}
+
+.login-container .field-row input {
+  background: white;
 }
 
 .login-container button {
@@ -52,11 +64,24 @@ button {
   box-shadow: 0px 5px 5px 0px #0003;
   margin-top: 50px;
   cursor: pointer;
-  
   transition: all 0.3s ease;
 }
 
-.login-container button:hover {
+.login-input-error {
+  border: 3px solid darkred;
+  color: darkred;
+}
+
+.login-error {
+  color: darkred;
+  margin: 0;
+  text-align: center;
+  font-size: 24px;
+}
+
+.item-card-container:hover,
+.resource-card:hover,
+button:hover {
   transform: translateY(-5px);
   filter: brightness(1.2);
 }
@@ -189,11 +214,6 @@ button {
   transition: all 0.3s ease;
 }
 
-.item-card-container:hover {
-  transform: translateY(-5px);
-  filter: brightness(1.2);
-}
-
 .resources-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -222,13 +242,25 @@ button {
   transition: all 0.3s ease;
 }
 
-.resource-card:hover {
-  transform: translateY(-5px);
-  filter: brightness(1.2);
-}
-
 .resource-icon {
   font-size: 70px;
+}
+
+.resources-edit-button {
+  position: fixed;
+  background: none;
+  font-family: "Kavoon", serif;
+  font-size: 34px;
+  border: none;
+  cursor: pointer;
+  text-shadow: 5px 5px 5px #0003;
+  margin-left: 20px;
+  transform: scale(-1, 1);
+}
+
+.resources-edit-button:hover {
+  transform: translateY(-5px) scale(-1, 1);
+  filter: brightness(1.2);
 }
 
 .custom-checkbox {
@@ -338,7 +370,8 @@ button {
   text-wrap: nowrap;
 }
 
-.field-row input {
+.field-row input,
+.emoji-input {
   flex: 1;
   min-width: 0;
   max-width: 100%;
@@ -347,6 +380,11 @@ button {
   border-radius: 10px;
   padding: 5px;
   margin: 5px;
+}
+
+.emoji-input:hover {
+  transform: none;
+  filter: none;
 }
 
 .rating-field,

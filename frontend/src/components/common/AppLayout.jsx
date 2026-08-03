@@ -75,7 +75,7 @@ export default function AppLayout() {
     },
   };
 
-  const pageKey = location.pathname.split("/")[1] || "login";
+  const pageKey = location.pathname.split("/")[1] || "planning";
 
   const theme = pageThemes[pageKey];
 

@@ -112,7 +112,7 @@ export default function ItemColumn({
 
               return (
                 <a
-                  key={item.link}
+                  key={item.id}
                   href={item.link}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -121,7 +121,23 @@ export default function ItemColumn({
                     backgroundColor: useEvenColor ? evenColor : oddColor,
                   }}
                 >
-                  <span>{item.label}</span>
+                  <span>
+                    {item.name}
+                    <button
+                      className="resources-edit-button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        setSelectedItem(item);
+                        setModalMode("edit");
+                        setModalOpen(true);
+                      }}
+                    >
+                      ✎
+                    </button>
+                  </span>
+
                   <span className="resource-icon">{item.icon}</span>
                 </a>
               );
