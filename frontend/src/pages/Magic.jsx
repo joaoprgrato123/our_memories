@@ -7,13 +7,14 @@ export default function MTG() {
   const theme = useOutletContext();
   const [checkedItems, setCheckedItems] = useState({});
   const [cards, setCards] = useState([]);
+  const [search, setSearch] = useState("");
 
   const refreshCards = async () => {
     const res = await fetch("http://localhost:8080/cards");
     const json = await res.json();
 
     const normalized = Array.isArray(json) ? json : json.cards;
-    
+
     setCards(normalized || []);
 
     const initialChecked = {};
@@ -70,9 +71,6 @@ export default function MTG() {
     await refreshCards();
   };
 
-  const jujuCards = cards.filter((c) => c.owner === "juju");
-  const dudiCards = cards.filter((c) => c.owner === "dudi");
-
   const sortOptions = ["Name", "Amount", "Cost", "Owned"];
 
   const fields = [
@@ -121,9 +119,25 @@ export default function MTG() {
     },
   ];
 
+  const searchField = fields[0]?.name;
+
+  const filteredCards = cards.filter((card) =>
+    String(card[searchField] ?? "")
+      .toLowerCase()
+      .includes(search.toLowerCase()),
+  );
+
+  const jujuCards = filteredCards.filter((c) => c.owner === "juju");
+  const dudiCards = filteredCards.filter((c) => c.owner === "dudi");
+
   return (
     <>
-      <Header title="Magic The Gathering" placeholder="Search card..." />
+      <Header
+        title="Magic The Gathering"
+        placeholder="Search card..."
+        search={search}
+        onSearch={setSearch}
+      />
 
       <div className="page-container" style={{ background: theme.container }}>
         <ItemColumn

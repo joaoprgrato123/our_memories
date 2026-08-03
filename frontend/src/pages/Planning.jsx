@@ -7,6 +7,7 @@ export default function Planning() {
   const theme = useOutletContext();
 
   const [plans, setPlans] = useState([]);
+  const [search, setSearch] = useState("");
 
   const refreshPlans = async () => {
     const res = await fetch("http://localhost:8080/plans");
@@ -54,10 +55,17 @@ export default function Planning() {
     await refreshPlans();
   };
 
-  const someday = plans.filter((p) => p.status === "someday");
-  const planned = plans.filter((p) => p.status === "planned");
-  const ourMemories = plans.filter((p) => p.status === "our memories");
+  // Search by the first field: title
+  const filteredPlans = plans.filter((plan) =>
+    plan.title?.toLowerCase().includes(search.toLowerCase()),
+  );
+
+  const someday = filteredPlans.filter((p) => p.status === "someday");
+  const planned = filteredPlans.filter((p) => p.status === "planned");
+  const ourMemories = filteredPlans.filter((p) => p.status === "our memories");
+
   const sortOptions = ["Name", "Date", "Location"];
+
   const fields = [
     {
       name: "title",
@@ -149,7 +157,12 @@ export default function Planning() {
 
   return (
     <>
-      <Header title="Planning" placeholder="Search event..." />
+      <Header
+        title="Planning"
+        placeholder="Search event..."
+        search={search}
+        onSearch={setSearch}
+      />
 
       <div className="page-container" style={{ background: theme.container }}>
         <ItemColumn

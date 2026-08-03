@@ -7,6 +7,7 @@ export default function Resources() {
   const theme = useOutletContext();
 
   const [resources, setResources] = useState([]);
+  const [search, setSearch] = useState("");
 
   const refreshResources = async () => {
     const res = await fetch("http://localhost:8080/resources");
@@ -84,9 +85,22 @@ export default function Resources() {
     },
   ];
 
+  const searchField = fields[0].name;
+
+  const filteredResources = resources.filter((resource) =>
+    String(resource[searchField] ?? "")
+      .toLowerCase()
+      .includes(search.toLowerCase()),
+  );
+
   return (
     <>
-      <Header title="Resources" placeholder="Search resource..." />
+      <Header
+        title="Resources"
+        placeholder="Search resource..."
+        search={search}
+        onSearch={setSearch}
+      />
 
       <div
         className="page-container resources"
@@ -94,7 +108,7 @@ export default function Resources() {
       >
         <ItemColumn
           title=""
-          items={resources}
+          items={filteredResources}
           theme={theme}
           fields={fields}
           variant="first"

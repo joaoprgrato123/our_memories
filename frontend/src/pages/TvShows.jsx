@@ -7,12 +7,14 @@ export default function TVShows() {
   const theme = useOutletContext();
 
   const [series, setSeries] = useState([]);
+  const [search, setSearch] = useState("");
 
   const refreshSeries = async () => {
     const res = await fetch("http://localhost:8080/series");
     const json = await res.json();
 
     const normalized = Array.isArray(json) ? json : json.series;
+
     setSeries(normalized || []);
   };
 
@@ -55,10 +57,8 @@ export default function TVShows() {
     await refreshSeries();
   };
 
-  const toWatch = series.filter((s) => s.status === "to watch");
-  const seen = series.filter((s) => s.status === "seen");
-  
   const sortOptions = ["Title", "Genre", "Score", "Duration", "Added Date"];
+
   const fields = [
     {
       name: "title",
@@ -115,9 +115,23 @@ export default function TVShows() {
     },
   ];
 
+  const filteredSeries = series.filter((show) =>
+  String(show.title ?? "")
+    .toLowerCase()
+    .includes(search.toLowerCase()),
+);
+
+  const toWatch = filteredSeries.filter((s) => s.status === "to watch");
+  const seen = filteredSeries.filter((s) => s.status === "seen");
+
   return (
     <>
-      <Header title="TV Shows" placeholder="Search TV Show..." />
+      <Header
+        title="TV Shows"
+        placeholder="Search TV Show..."
+        search={search}
+        onSearch={setSearch}
+      />
 
       <div className="page-container" style={{ background: theme.container }}>
         <ItemColumn
