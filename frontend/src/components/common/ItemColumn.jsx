@@ -16,6 +16,8 @@ export default function ItemColumn({
   fields,
   onSave,
   onDelete,
+  onMove,
+  dropStatus,
 }) {
   const colors = {
     first: {
@@ -43,12 +45,92 @@ export default function ItemColumn({
 
   const [showSort, setShowSort] = useState(false);
   const sortRef = useRef(null);
+
   const isResources =
     Array.isArray(items) && typeof items[0] === "object" && "icon" in items[0];
+
   const [sortSelected, setSortSelected] = useState(sortOptions?.[0]);
+  const [sortDirection, setSortDirection] = useState("asc");
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("add");
   const [selectedItem, setSelectedItem] = useState(null);
+
+  const sortedItems = [...(items || [])].sort((a, b) => {
+    switch (sortSelected) {
+      case "Name":
+      case "Title":
+        return sortDirection === "asc"
+          ? String(a.name ?? a.title ?? "").localeCompare(
+              String(b.name ?? b.title ?? ""),
+            )
+          : String(b.name ?? b.title ?? "").localeCompare(
+              String(a.name ?? a.title ?? ""),
+            );
+
+      case "Planted":
+        return sortDirection === "asc"
+          ? Number(a.planted) - Number(b.planted)
+          : Number(b.planted) - Number(a.planted);
+
+      case "Cost":
+        return sortDirection === "asc"
+          ? Number(a.cost) - Number(b.cost)
+          : Number(b.cost) - Number(a.cost);
+
+      case "Owned":
+        return sortDirection === "asc"
+          ? Number(a.owned) - Number(b.owned)
+          : Number(b.owned) - Number(a.owned);
+
+      case "Amount":
+        return sortDirection === "asc"
+          ? Number(a.amount ?? 0) - Number(b.amount ?? 0)
+          : Number(b.amount ?? 0) - Number(a.amount ?? 0);
+
+      case "Rate":
+      case "Score":
+        return sortDirection === "asc"
+          ? Number(a.score ?? 0) - Number(b.score ?? 0)
+          : Number(b.score ?? 0) - Number(a.score ?? 0);
+
+      case "Seed Season":
+        return sortDirection === "asc"
+          ? String(a.seed_season ?? "").localeCompare(
+              String(b.seed_season ?? ""),
+            )
+          : String(b.seed_season ?? "").localeCompare(
+              String(a.seed_season ?? ""),
+            );
+
+      case "Genre":
+        return sortDirection === "asc"
+          ? String(a.genre ?? "").localeCompare(String(b.genre ?? ""))
+          : String(b.genre ?? "").localeCompare(String(a.genre ?? ""));
+
+      case "Duration":
+        return sortDirection === "asc"
+          ? Number(a.duration ?? 0) - Number(b.duration ?? 0)
+          : Number(b.duration ?? 0) - Number(a.duration ?? 0);
+
+      case "Added Date":
+        return sortDirection === "asc"
+          ? new Date(a.added_date ?? 0) - new Date(b.added_date ?? 0)
+          : new Date(b.added_date ?? 0) - new Date(a.added_date ?? 0);
+
+      case "Date":
+        return sortDirection === "asc"
+          ? new Date(a.date ?? 0) - new Date(b.date ?? 0)
+          : new Date(b.date ?? 0) - new Date(a.date ?? 0);
+
+      case "Location":
+        return sortDirection === "asc"
+          ? String(a.location ?? "").localeCompare(String(b.location ?? ""))
+          : String(b.location ?? "").localeCompare(String(a.location ?? ""));
+
+      default:
+        return 0;
+    }
+  });
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -58,11 +140,47 @@ export default function ItemColumn({
     }
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
+  const handleDragStart = (event, item) => {
+    event.dataTransfer.effectAllowed = "move";
+
+    event.dataTransfer.setData("application/json", JSON.stringify(item));
+  };
+
+  const handleDragOver = (event) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = (event) => {
+    event.preventDefault();
+
+    if (!onMove) {
+      return;
+    }
+
+    const itemData = event.dataTransfer.getData("application/json");
+
+    if (!itemData) {
+      return;
+    }
+
+    const item = JSON.parse(itemData);
+
+    onMove(item, dropStatus);
+  };
+
   return (
-    <section className="item-column">
+    <section
+      className="item-column"
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
       <div className="column-header" style={{ background: titleColor }}>
         <h2 className="item-title">{title}</h2>
 
@@ -91,7 +209,14 @@ export default function ItemColumn({
             <SortPanel
               options={sortOptions}
               selected={sortSelected}
-              onSelect={(opt) => setSortSelected(opt)}
+              onSelect={(opt) => {
+                if (opt === sortSelected) {
+                  setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+                } else {
+                  setSortSelected(opt);
+                  setSortDirection("asc");
+                }
+              }}
               activeColor={titleColor}
             />
           )}
@@ -123,6 +248,7 @@ export default function ItemColumn({
                 >
                   <span>
                     {item.name}
+
                     <button
                       className="resources-edit-button"
                       onClick={(e) => {
@@ -144,13 +270,15 @@ export default function ItemColumn({
             })}
           </div>
         ) : (
-          (items || []).map((item, index) => {
+          sortedItems.map((item, index) => {
             const isChecked = !!checkedItems?.[item.id];
 
             return (
               <div
                 key={item.id}
                 className="item-card-container"
+                draggable
+                onDragStart={(event) => handleDragStart(event, item)}
                 style={{
                   backgroundColor: index % 2 === 0 ? oddColor : evenColor,
                 }}
