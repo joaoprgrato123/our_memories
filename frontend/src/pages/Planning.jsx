@@ -55,6 +55,20 @@ export default function Planning() {
     await refreshPlans();
   };
 
+  const handleMove = async (item, newStatus) => {
+    if (item.status === newStatus) {
+      return;
+    }
+    
+    await fetch(`http://localhost:8080/plans/${item.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...item, status: newStatus }),
+    });
+
+    await refreshPlans();
+  };
+
   // Search by the first field: title
   const filteredPlans = plans.filter((plan) =>
     plan.title?.toLowerCase().includes(search.toLowerCase()),
@@ -174,6 +188,8 @@ export default function Planning() {
           fields={fields}
           onSave={handleSave}
           onDelete={handleDelete}
+          onMove={handleMove}
+          dropStatus="someday"
         />
 
         <ItemColumn
@@ -185,6 +201,8 @@ export default function Planning() {
           fields={fields}
           onSave={handleSave}
           onDelete={handleDelete}
+          onMove={handleMove}
+          dropStatus="planned"
         />
 
         <ItemColumn
@@ -196,6 +214,8 @@ export default function Planning() {
           fields={fields}
           onSave={handleSave}
           onDelete={handleDelete}
+          onMove={handleMove}
+          dropStatus="our memories"
         />
       </div>
     </>

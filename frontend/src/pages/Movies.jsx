@@ -56,6 +56,20 @@ export default function Movies() {
     await refreshMovies();
   };
 
+  const handleMove = async (item, newStatus) => {
+    if (item.status === newStatus) {
+      return;
+    }
+    
+    await fetch(`http://localhost:8080/movies/${item.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...item, status: newStatus }),
+    });
+
+    await refreshMovies();
+  };
+
   const sortOptions = ["Title", "Genre", "Score", "Duration", "Added Date"];
 
   const fields = [
@@ -144,6 +158,8 @@ export default function Movies() {
           fields={fields}
           onSave={handleSave}
           onDelete={handleDelete}
+          onMove={handleMove}
+          dropStatus="to watch"
         />
 
         <ItemColumn
@@ -155,6 +171,8 @@ export default function Movies() {
           fields={fields}
           onSave={handleSave}
           onDelete={handleDelete}
+          onMove={handleMove}
+          dropStatus="seen"
         />
       </div>
     </>

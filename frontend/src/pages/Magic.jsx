@@ -71,6 +71,20 @@ export default function MTG() {
     await refreshCards();
   };
 
+  const handleMove = async (item, newStatus) => {
+    if (item.status === newStatus) {
+      return;
+    }
+    
+    await fetch(`http://localhost:8080/cards/${item.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...item, owner: newStatus }),
+    });
+
+    await refreshCards();
+  };
+
   const sortOptions = ["Name", "Amount", "Cost", "Owned"];
 
   const fields = [
@@ -152,6 +166,8 @@ export default function MTG() {
           fields={fields}
           onSave={handleSave}
           onDelete={handleDelete}
+          onMove={handleMove}
+          dropStatus="juju"
         />
 
         <ItemColumn
@@ -166,6 +182,8 @@ export default function MTG() {
           fields={fields}
           onSave={handleSave}
           onDelete={handleDelete}
+          onMove={handleMove}
+          dropStatus="dudi"
         />
       </div>
     </>

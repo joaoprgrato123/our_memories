@@ -57,6 +57,20 @@ export default function TVShows() {
     await refreshSeries();
   };
 
+  const handleMove = async (item, newStatus) => {
+    if (item.status === newStatus) {
+      return;
+    }
+
+    await fetch(`http://localhost:8080/series/${item.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...item, status: newStatus }),
+    });
+
+    await refreshSeries();
+  };
+
   const sortOptions = ["Title", "Genre", "Score", "Duration", "Added Date"];
 
   const fields = [
@@ -116,10 +130,10 @@ export default function TVShows() {
   ];
 
   const filteredSeries = series.filter((show) =>
-  String(show.title ?? "")
-    .toLowerCase()
-    .includes(search.toLowerCase()),
-);
+    String(show.title ?? "")
+      .toLowerCase()
+      .includes(search.toLowerCase()),
+  );
 
   const toWatch = filteredSeries.filter((s) => s.status === "to watch");
   const seen = filteredSeries.filter((s) => s.status === "seen");
@@ -143,6 +157,8 @@ export default function TVShows() {
           fields={fields}
           onSave={handleSave}
           onDelete={handleDelete}
+          onMove={handleMove}
+          dropStatus="to watch"
         />
 
         <ItemColumn
@@ -154,6 +170,8 @@ export default function TVShows() {
           fields={fields}
           onSave={handleSave}
           onDelete={handleDelete}
+          onMove={handleMove}
+          dropStatus="seen"
         />
       </div>
     </>

@@ -151,6 +151,20 @@ export default function Garden() {
     await refreshPlants();
   };
 
+  const handleMove = async (item, newStatus) => {
+    if (item.status === newStatus) {
+      return;
+    }
+    
+    await fetch(`http://localhost:8080/plants/${item.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...item, status: newStatus }),
+    });
+
+    await refreshPlants();
+  };
+
   const seasonal = filteredPlants.filter((p) => p.status === "seasonal");
   const permanent = filteredPlants.filter((p) => p.status === "permanent");
 
@@ -175,7 +189,8 @@ export default function Garden() {
           sortOptions={sortOptions}
           fields={fields}
           onSave={handleSave}
-          onDelete={handleDelete}
+          onDelete={handleDelete}onMove={handleMove}
+          dropStatus="seasonal"
         />
 
         <ItemColumn
@@ -189,7 +204,8 @@ export default function Garden() {
           sortOptions={sortOptions}
           fields={fields}
           onSave={handleSave}
-          onDelete={handleDelete}
+          onDelete={handleDelete}onMove={handleMove}
+          dropStatus="permanent"
         />
       </div>
     </>
