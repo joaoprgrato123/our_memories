@@ -27,6 +27,16 @@ input:focus {
   border-color: white;
 }
 
+.view-number-input::-webkit-inner-spin-button,
+.view-number-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.view-number-input {
+  -moz-appearance: textfield;
+}
+
 .login-container label,
 .login-container input {
   font-size: 30px !important;
@@ -286,6 +296,15 @@ button:hover {
   font-weight: bold;
   color: var(--check-color);
   transition: 0.2s;
+}
+
+.custom-checkbox.view-only {
+  cursor: default;
+}
+
+.custom-checkbox.view-only .checkmark {
+  background: transparent;
+  border: none !important;
 }
 
 .modal-backdrop {
