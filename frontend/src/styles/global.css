@@ -27,6 +27,16 @@ input:focus {
   border-color: white;
 }
 
+.view-number-input::-webkit-inner-spin-button,
+.view-number-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.view-number-input {
+  -moz-appearance: textfield;
+}
+
 .login-container label,
 .login-container input {
   font-size: 30px !important;
@@ -288,6 +298,15 @@ button:hover {
   transition: 0.2s;
 }
 
+.custom-checkbox.view-only {
+  cursor: default;
+}
+
+.custom-checkbox.view-only .checkmark {
+  background: transparent;
+  border: none !important;
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -380,6 +399,21 @@ button:hover {
   border-radius: 10px;
   padding: 5px;
   margin: 5px;
+}
+
+.view-field-value {
+  margin: auto;
+  padding: 5px;
+  font-size: 18px;
+  white-space: nowrap;
+}
+
+.view-field-value.title-modal {
+  width: auto;
+}
+
+.title-container-modal .view-field-value {
+  font-size: 20px;
 }
 
 .emoji-input:hover {

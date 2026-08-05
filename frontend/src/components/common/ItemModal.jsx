@@ -21,20 +21,6 @@ export default function ItemModal({
   const isView = mode === "view";
   const isEdit = mode === "edit";
 
-  const readOnly = isView;
-
-  const inputProps = {
-    readOnly,
-    style: isView
-      ? {
-          background: "transparent",
-          border: "none",
-          pointerEvents: "none",
-          color: "inherit",
-        }
-      : {},
-  };
-
   const headerFields = fields.filter((f) => f.section === "header");
   const bodyFields = fields.filter((f) => f.section === "body");
 
@@ -65,21 +51,46 @@ export default function ItemModal({
     return new Date(value).toISOString().split("T")[0];
   };
 
+  const getToday = () => {
+    const today = new Date();
+    return today.toISOString().split("T")[0];
+  };
+
   const normalizeItem = (item) => {
-    if (!item) return {};
+    if (!item) {
+      const newItem = {};
+
+      fields.forEach((field) => {
+        if (field.name === "added_date") {
+          newItem[field.name] = getToday();
+        }
+      });
+
+      return newItem;
+    }
 
     const normalized = { ...item };
 
-    fields.forEach((f) => {
-      if (f.type === "date" && item[f.name]) {
-        normalized[f.name] = toDateInput(item[f.name]);
+    fields.forEach((field) => {
+      if (field.type === "date" && item[field.name]) {
+        normalized[field.name] = toDateInput(item[field.name]);
       }
     });
 
     return normalized;
   };
 
-  const [formData, setFormData] = useState(() => normalizeItem(item));
+  const getInitialFormData = () => {
+    if (item) {
+      return normalizeItem(item);
+    }
+
+    return {
+      added_date: new Date().toISOString().split("T")[0],
+    };
+  };
+
+  const [formData, setFormData] = useState(getInitialFormData);
 
   if (!open) return null;
 
@@ -177,7 +188,12 @@ export default function ItemModal({
       row.forEach((field, idx) => {
         if (field.label) {
           elements.push(
-            <label key={`l-${field.name}`}>{field.placeholder}:</label>,
+            <label
+              key={`l-${field.name}`}
+              style={{ color: colors.title, filter: "brightness(0.8)" }}
+            >
+              {field.placeholder}:
+            </label>,
           );
         }
 
@@ -195,7 +211,7 @@ export default function ItemModal({
           elements.push(
             <label
               key={field.name}
-              className="custom-checkbox"
+              className={`custom-checkbox ${isView ? "view-only" : ""}`}
               style={{
                 position: "static",
               }}
@@ -281,31 +297,49 @@ export default function ItemModal({
           );
         } else {
           elements.push(
-            <>
-              <input
-                key={field.name}
-                type={field.type}
-                min={0}
-                placeholder={field.placeholder}
-                title={field.placeholder}
-                value={formData?.[field.name] ?? ""}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    [field.name]:
-                      field.type === "number"
-                        ? Number(e.target.value)
-                        : e.target.value,
-                  }))
-                }
-                className={field.title ? "title-modal" : ""}
-                {...inputProps}
-              />
+            isView ? (
+              <>
+                <span
+                  key={field.name}
+                  className={
+                    field.title
+                      ? "view-field-value title-modal"
+                      : "view-field-value"
+                  }
+                  title={field.placeholder}
+                >
+                  {formData?.[field.name] ?? ""}
+                </span>
+                {field.suffix && (
+                  <span style={{ marginLeft: "6px" }}>{field.suffix}</span>
+                )}
+              </>
+            ) : (
+              <>
+                <input
+                  key={field.name}
+                  type={field.type}
+                  min={0}
+                  placeholder={field.placeholder}
+                  title={field.placeholder}
+                  value={formData?.[field.name] ?? ""}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      [field.name]:
+                        field.type === "number"
+                          ? Number(e.target.value)
+                          : e.target.value,
+                    }))
+                  }
+                  className={field.title ? "title-modal" : ""}
+                />
 
-              {field.suffix && (
-                <span style={{ marginLeft: "6px" }}>{field.suffix}</span>
-              )}
-            </>,
+                {field.suffix && (
+                  <span style={{ marginLeft: "6px" }}>{field.suffix}</span>
+                )}
+              </>
+            ),
           );
         }
 
