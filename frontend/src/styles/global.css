@@ -401,6 +401,21 @@ button:hover {
   margin: 5px;
 }
 
+.view-field-value {
+  margin: auto;
+  padding: 5px;
+  font-size: 18px;
+  white-space: nowrap;
+}
+
+.view-field-value.title-modal {
+  width: auto;
+}
+
+.title-container-modal .view-field-value {
+  font-size: 20px;
+}
+
 .emoji-input:hover {
   transform: none;
   filter: none;

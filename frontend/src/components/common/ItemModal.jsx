@@ -21,20 +21,6 @@ export default function ItemModal({
   const isView = mode === "view";
   const isEdit = mode === "edit";
 
-  const readOnly = isView;
-
-  const inputProps = {
-    readOnly,
-    style: isView
-      ? {
-          background: "transparent",
-          border: "none",
-          pointerEvents: "none",
-          color: "inherit",
-        }
-      : {},
-  };
-
   const headerFields = fields.filter((f) => f.section === "header");
   const bodyFields = fields.filter((f) => f.section === "body");
 
@@ -311,33 +297,49 @@ export default function ItemModal({
           );
         } else {
           elements.push(
-            <>
-              <input
-                key={field.name}
-                type={field.type}
-                min={0}
-                placeholder={field.placeholder}
-                title={field.placeholder}
-                value={formData?.[field.name] ?? ""}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    [field.name]:
-                      field.type === "number"
-                        ? Number(e.target.value)
-                        : e.target.value,
-                  }))
-                }
-                className={`${field.title ? "title-modal" : ""} ${
-                  isView && field.type === "number" ? "view-number-input" : ""
-                }`}
-                {...inputProps}
-              />
+            isView ? (
+              <>
+                <span
+                  key={field.name}
+                  className={
+                    field.title
+                      ? "view-field-value title-modal"
+                      : "view-field-value"
+                  }
+                  title={field.placeholder}
+                >
+                  {formData?.[field.name] ?? ""}
+                </span>
+                {field.suffix && (
+                  <span style={{ marginLeft: "6px" }}>{field.suffix}</span>
+                )}
+              </>
+            ) : (
+              <>
+                <input
+                  key={field.name}
+                  type={field.type}
+                  min={0}
+                  placeholder={field.placeholder}
+                  title={field.placeholder}
+                  value={formData?.[field.name] ?? ""}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      [field.name]:
+                        field.type === "number"
+                          ? Number(e.target.value)
+                          : e.target.value,
+                    }))
+                  }
+                  className={field.title ? "title-modal" : ""}
+                />
 
-              {field.suffix && (
-                <span style={{ marginLeft: "6px" }}>{field.suffix}</span>
-              )}
-            </>,
+                {field.suffix && (
+                  <span style={{ marginLeft: "6px" }}>{field.suffix}</span>
+                )}
+              </>
+            ),
           );
         }
 
