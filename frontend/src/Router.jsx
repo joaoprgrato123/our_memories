@@ -2,7 +2,7 @@ import AppLayout from "./components/common/AppLayout";
 import Login from "./pages/Login";
 import Planning from "./pages/Planning";
 import Movies from "./pages/Movies";
-import TVShows from "./pages/TVShows";
+import TVShows from "./pages/TvShows";
 import Garden from "./pages/Garden";
 import MTG from "./pages/Magic";
 import Resources from "./pages/Resources";

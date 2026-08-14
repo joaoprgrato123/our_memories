@@ -1,8 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 	"our-memories/handler"
 	"our-memories/models"
 	"our-memories/repository"
@@ -13,6 +15,10 @@ import (
 
 func main() {
 	// Storage initialization
+	if err := ensureDataFile("data.json"); err != nil {
+		log.Fatalf("failed to initialize data file: %v", err)
+	}
+
 	storage := &models.JSONStorage{
 		FilePath: "data.json",
 	}
@@ -123,4 +129,30 @@ func corsMiddleware(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+func ensureDataFile(path string) error {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		defaultData := models.AppData{
+			Cards:     []models.MTGCard{},
+			Movies:    []models.Movie{},
+			Series:    []models.Serie{},
+			OurPlans:  []models.Plan{},
+			Plants:    []models.Plant{},
+			Resources: []models.Resource{},
+		}
+
+		file, err := os.Create(path)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+
+		encoder := json.NewEncoder(file)
+		encoder.SetIndent("", "  ")
+		return encoder.Encode(defaultData)
+	} else if err != nil {
+		return err
+	}
+	return nil
 }
